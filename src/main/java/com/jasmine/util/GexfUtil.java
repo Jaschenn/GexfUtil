@@ -25,6 +25,8 @@ public class GexfUtil {
     private static HashMap hashMap = new HashMap();
     private static Attribute modularity_class;
     static {
+
+        gexf.setVisualization(true);//设置viz可见性
         gexf.getMetadata().setCreator("GexfUtil_Create_By_Jasc");
         graph.setDefaultEdgeType(EdgeType.UNDIRECTED).setMode(Mode.STATIC);
         AttributeList attributes = new AttributeListImpl(AttributeClass.NODE);
