@@ -10,6 +10,7 @@ import it.uniroma1.dis.wsngroup.gexf4j.core.data.Attribute;
 import it.uniroma1.dis.wsngroup.gexf4j.core.data.AttributeClass;
 import it.uniroma1.dis.wsngroup.gexf4j.core.data.AttributeList;
 import it.uniroma1.dis.wsngroup.gexf4j.core.data.AttributeType;
+import it.uniroma1.dis.wsngroup.gexf4j.core.impl.EdgeImpl;
 import it.uniroma1.dis.wsngroup.gexf4j.core.impl.GexfImpl;
 import it.uniroma1.dis.wsngroup.gexf4j.core.impl.StaxGraphWriter;
 import it.uniroma1.dis.wsngroup.gexf4j.core.impl.data.AttributeListImpl;
@@ -18,8 +19,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 
 public class GexfUtil {
     private static Gexf gexf = new GexfImpl();
@@ -27,7 +30,7 @@ public class GexfUtil {
     private static FileWriter fileWriter;
     private static StaxGraphWriter staxGraphWriter = new StaxGraphWriter();
     private static Graph graph = gexf.getGraph();
-    private static HashMap hashMap = new HashMap();
+    private static HashMap nodesMap = new HashMap();
     private static Attribute modularity_class;
     static {
 
@@ -39,6 +42,11 @@ public class GexfUtil {
         modularity_class = attributes.createAttribute("modularity_class",AttributeType.INTEGER,"Modularity Class");//类别为整形
 
     }
+
+    public static HashMap getNodesMap() {
+        return nodesMap;
+    }
+
     /**
      * @param file 要生成的文件，默认目录为项目根目录
      *
@@ -62,30 +70,69 @@ public class GexfUtil {
      * @param categories 节点的类别，在这里是通过设置一个属性modularity_class完成的
      * */
     public static void addNode(String id,String label,String categories,int size){
-        Node node = graph.createNode(id);
-        node.setLabel(label);
-        node.setSize(size);
-        node.getAttributeValues().addValue(modularity_class,categories);
-        hashMap.put(id,node);
+        if(!nodesMap.containsKey(id)) {
+            Node node = graph.createNode(id);
+            node.setLabel(label);
+            node.setSize(size);
+            node.getAttributeValues().addValue(modularity_class, categories);
+            nodesMap.put(id, node);
+
+        }else {
+            GexfUtil.updateNode(id,label,categories,size);
+        }
+    }
+    public static void updateNode(String id,String label,String categories,int size){
+
+        if(nodesMap.containsKey(id)) {
+            Node node = (Node) nodesMap.get(id);
+            if (!label.equals("")) {
+                node.setLabel(label);
+            }
+            if (!categories.equals("")) {
+                node.getAttributeValues().addValue(modularity_class, categories);
+            }
+            if (!(size == 0)) {
+                node.setSize(size);
+            }
+            nodesMap.put(id, node);
+        }
     }
     public static void addNode(String id,String lable,String categories){
-        Node node = graph.createNode(id);
-        node.setLabel(lable);
-        node.getAttributeValues().addValue(modularity_class,categories);
-        hashMap.put(id,node);
+        if(!nodesMap.containsKey(id)) {
+            Node node = graph.createNode(id);
+            node.setLabel(lable);
+            node.getAttributeValues().addValue(modularity_class, categories);
+            nodesMap.put(id, node);
+        }
     }
     /**
      * @param sourceid 边的源节点地址，这里需要填入的是边的id
      * @param distid 边的目的节点地址，这里需要填入的是边的id
      * */
     public static void addEdge(String sourceid,String distid){
-        ((Node)hashMap.get(sourceid)).connectTo((Node)hashMap.get(distid));
+       if(!nodesMap.containsKey(sourceid)) {
+        GexfUtil.addNode(sourceid,"temp","999");
+       }
+       if(!nodesMap.containsKey(distid)) {
+            GexfUtil.addNode(distid,"temp","999");
+        }
+
+        ((Node)nodesMap.get(sourceid)).connectTo((Node)nodesMap.get(distid));
     }
     /**
      * @Description 该方法将之前输入的节点和边写入到文件中，因此在写入边和节点完成之后，请务必调用该方法。
      * */
     public static void flush(){
         try {
+            int NSIZE = 0;
+            List<Node> nodes = graph.getNodes();
+            for (Node n :
+                    nodes) {
+                List list = n.getEdges();
+                if(n.getLabel().equals("temp")){
+                    n.setSize(-1);//如果存在临时添加的节点，那么就把它的大小设置为不可见
+                }
+            }
             staxGraphWriter.writeToStream(gexf,fileWriter,"UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
