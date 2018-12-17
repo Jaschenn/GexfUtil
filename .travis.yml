@@ -3,7 +3,7 @@ language: java
 jdk:
   - oraclejdk8
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true
-script: mvn test
+script: "mvn cobertura:cobertura"
 env:
   global:
     - CODECOV_TOKEN: "c384d4c0-7f8f-4ac6-b168-9ada34fb8f6b"
