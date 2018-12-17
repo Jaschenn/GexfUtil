@@ -1,4 +1,6 @@
 [![Build Status](https://travis-ci.org/Jaschenn/GexfUtil.svg?branch=master)](https://travis-ci.org/Jaschenn/GexfUtil)
+[![codecov](https://codecov.io/gh/Jaschenn/GexfUtil/branch/master/graph/badge.svg)](https://codecov.io/gh/Jaschenn/GexfUtil)
+![](https://img.shields.io/hexpm/l/plug.svg)
 
 # GexfUtil
 GEXF (Graph Exchange XML Format) is a language for describing complex networks structures, their associated data and dynamics. GexfUtil is a tool to generate .gexf files 

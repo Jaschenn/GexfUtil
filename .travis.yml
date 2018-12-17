@@ -4,3 +4,8 @@ jdk:
   - oraclejdk8
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true
 script: mvn test
+env:
+  global:
+    - CODECOV_TOKEN: c384d4c0-7f8f-4ac6-b168-9ada34fb8f6b
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -t uuid-repo-token
