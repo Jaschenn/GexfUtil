@@ -1,4 +1,4 @@
-import com.jasmine.util.GexfUtil;
+import com.github.util.GexfUtil;
 import org.junit.Test;
 
 import java.io.File;
